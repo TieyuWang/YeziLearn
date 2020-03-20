@@ -1,4 +1,4 @@
-package com.yezi.yezilearn.ipc.binder.client;
+package com.yezi.yezilearn.ipc;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -13,8 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.yezi.yezilearn.R;
-import com.yezi.yezilearn.ipc.binder.server.IAudioService;
-import com.yezi.yezilearn.ipc.binder.server.Server;
+import com.yezi.yezilearn.ipc.binder.IAudioService;
+
 
 /**
  * @author : yezi
@@ -24,6 +24,7 @@ import com.yezi.yezilearn.ipc.binder.server.Server;
  */
 public class Client extends AppCompatActivity {
     IAudioService mAudioService;
+    IMediaService mMediaService;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,19 +52,32 @@ public class Client extends AppCompatActivity {
     }
 
     void connectServer(){
-        bindService(new Intent(this, Server.class),mServiceConnection, Context.BIND_AUTO_CREATE);
+        bindService(new Intent(this, Server.class), mAudioServiceConnection, Context.BIND_AUTO_CREATE);
+        bindService(new Intent(this, Server.class), mAudioServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
-    ServiceConnection mServiceConnection = new ServiceConnection() {
+    ServiceConnection mAudioServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mAudioService = IAudioService.Stub.asInterface(iBinder);
-            Toast.makeText(getApplicationContext(),"服务连接成功",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),"audio服务连接成功",Toast.LENGTH_LONG).show();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            Toast.makeText(getApplicationContext(),"服务断开连接",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),"audio服务断开连接",Toast.LENGTH_LONG).show();
+        }
+    };
+    ServiceConnection mMediaServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            mAudioService = IAudioService.Stub.asInterface(iBinder);
+            Toast.makeText(getApplicationContext(),"media服务连接成功",Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            Toast.makeText(getApplicationContext(),"media服务断开连接",Toast.LENGTH_LONG).show();
         }
     };
 }

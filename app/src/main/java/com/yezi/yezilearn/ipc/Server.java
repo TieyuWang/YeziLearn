@@ -1,4 +1,4 @@
-package com.yezi.yezilearn.ipc.binder.server;
+package com.yezi.yezilearn.ipc;
 
 import android.app.Service;
 import android.content.Intent;
@@ -7,6 +7,8 @@ import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+
+import com.yezi.yezilearn.ipc.binder.IAudioService;
 
 /**
  * @author : yezi
@@ -42,18 +44,5 @@ public class Server extends Service {
             return mVolumeIndex;
         }
     };
-/*    IAudioService mServiceBinder = new IAudioServiceBinder() {
-        @Override
-        public void setVolume(int index) {
-            mVolumeIndex = index;
-            Log.d(TAG, "setVolume: "+index);
-        }
-
-        @Override
-        public int getVolume() {
-            Log.d(TAG, "getVolume: "+mVolumeIndex);
-            return mVolumeIndex;
-        }
-    };*/
 
 }
