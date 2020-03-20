@@ -32,12 +32,14 @@ public class Server extends Service {
     Binder mServiceBinder = new IAudioService.Stub() {
         @Override
         public void setVolume(int index) {
-
+            Log.d(TAG, "setVolume: "+index);
+            mVolumeIndex = index;
         }
 
         @Override
         public int getVolume() {
-            return 0;
+            Log.d(TAG, "getVolume: "+mVolumeIndex);
+            return mVolumeIndex;
         }
     };
 /*    IAudioService mServiceBinder = new IAudioServiceBinder() {

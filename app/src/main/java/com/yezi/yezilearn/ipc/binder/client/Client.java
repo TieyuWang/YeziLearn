@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,16 +28,24 @@ public class Client extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
+        connectServer();
+        final int[] finalIndex = {0};
         findViewById(R.id.set_volume).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if(mAudioService!=null){
+                    mAudioService.setVolume(finalIndex[0]);
+                    finalIndex[0]++;
+                }
             }
         });
         findViewById(R.id.get_volume).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if(mAudioService!=null){
+                    int index = mAudioService.getVolume();
+                    Toast.makeText(getApplicationContext(),"当前index = "+index,Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -49,11 +58,12 @@ public class Client extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mAudioService = IAudioService.Stub.asInterface(iBinder);
+            Toast.makeText(getApplicationContext(),"服务连接成功",Toast.LENGTH_LONG).show();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-
+            Toast.makeText(getApplicationContext(),"服务断开连接",Toast.LENGTH_LONG).show();
         }
     };
 }
