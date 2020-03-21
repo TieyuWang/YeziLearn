@@ -48,23 +48,24 @@ public interface IAudioService extends IInterface {
         }
 
         @Override
-        protected boolean onTransact(int code, @NonNull Parcel data, @Nullable Parcel reply, int flags) throws RemoteException {
+        protected boolean onTransact(int code, @NonNull Parcel data, @NonNull Parcel reply, int flags) throws RemoteException {
             switch (code){
                 case INTERFACE_TRANSACTION:
                     Log.d(TAG, "onTransact: INTERFACE_TRANSACTION");
-                    reply.writeInterfaceToken(DESCRIPTOR);
+                    reply.writeString(DESCRIPTOR);
                     return true;
                 case TRANSACTION_SET_VOLUME:
                     Log.d(TAG, "onTransact: TRANSACTION_SET_VOLUME");
+                    data.enforceInterface(DESCRIPTOR);
                     setVolume(data.readInt());
+                    reply.writeNoException();
                     return true;
                 case TRANSACTION_GET_VOLUME:
                     Log.d(TAG, "onTransact: TRANSACTION_GET_VOLUME");
-                    if(reply != null) {
-                        Log.d(TAG, "onTransact: != null "+getVolume());
-                    //    reply.writeNoException();
-                        reply.writeInt(getVolume());
-                    }
+                    data.enforceInterface(DESCRIPTOR);
+                    int result = getVolume();
+                    reply.writeNoException();
+                    reply.writeInt(result);
                     return true;
 
                 default:
@@ -75,6 +76,14 @@ public interface IAudioService extends IInterface {
         }
 
         public static IAudioService asInterface(IBinder binder){
+            if(binder == null){
+                return null;
+            }
+
+            IInterface iInterface = binder.queryLocalInterface(DESCRIPTOR);
+            if(iInterface instanceof IAudioService){
+                return (IAudioService) iInterface;
+            }
 
             return new Proxy(binder);
         }
@@ -96,18 +105,16 @@ public interface IAudioService extends IInterface {
         }
 
         @Override
-        public void setVolume(int index) {
+        public void setVolume(int index) throws RemoteException{
             Log.d(TAG, "setVolume: "+index);
             Parcel data = Parcel.obtain();
             Parcel replay = Parcel.obtain();
-
             try {
-             //   data.writeInterfaceToken();
+                data.writeInterfaceToken(Stub.DESCRIPTOR);
                 data.writeInt(index);
                 mRemote.transact(Stub.TRANSACTION_SET_VOLUME,data,replay,0);
+                replay.readException();
                 Log.d(TAG, "setVolume: transact over");
-            } catch (RemoteException e) {
-                e.printStackTrace();
             }finally {
                 data.recycle();
                 replay.recycle();
@@ -115,18 +122,18 @@ public interface IAudioService extends IInterface {
         }
 
         @Override
-        public int getVolume() {
+        public int getVolume() throws RemoteException {
             Log.d(TAG, "getVolume: ");
             Parcel data = Parcel.obtain();
             Parcel replay = Parcel.obtain();
             int result = 0;
             try {
+                data.writeInterfaceToken(Stub.DESCRIPTOR);
                 mRemote.transact(Stub.TRANSACTION_GET_VOLUME,data,replay,0);
               //  replay.readException();
+                replay.readException();
                 result = replay.readInt();
                 Log.d(TAG, "getVolume: "+result+" "+data.readInt());
-            } catch (RemoteException e) {
-                e.printStackTrace();
             }finally {
                 data.recycle();
                 replay.recycle();
