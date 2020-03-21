@@ -16,7 +16,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".ipc.Server"
+        <service android:name=".ipc.AudioServer"
             android:process=".server_process">
 
         </service>
