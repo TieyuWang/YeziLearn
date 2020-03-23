@@ -17,9 +17,10 @@
             </intent-filter>
         </activity>
         <service android:name=".ipc.AudioServer"
-            android:process=".server_process">
+            android:process=".server_process"/>
 
-        </service>
+        <service android:name=".ipc.MediaServer"
+            android:process=".server_process"/>
     </application>
 
 </manifest>

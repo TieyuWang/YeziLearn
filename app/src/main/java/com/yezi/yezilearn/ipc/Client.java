@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -32,6 +33,7 @@ import java.util.ArrayList;
  * version: 1.0
  */
 public class Client extends AppCompatActivity {
+    final String TAG = "Client";
     IAudioService mAudioService;
     IMediaService mMediaService;
 
@@ -78,7 +80,7 @@ public class Client extends AppCompatActivity {
 
     void connectServer(){
         bindService(new Intent(this, AudioServer.class), mAudioServiceConnection, Context.BIND_AUTO_CREATE);
-        bindService(new Intent(this, AudioServer.class), mMediaServiceConnection, Context.BIND_AUTO_CREATE);
+        bindService(new Intent(this, MediaServer.class), mMediaServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     ServiceConnection mAudioServiceConnection = new ServiceConnection() {
@@ -108,6 +110,7 @@ public class Client extends AppCompatActivity {
     };
     static Toast mToast;
     void showToast(String msg){
+        Log.d(TAG, msg);
         if(mToast != null){
             mToast.cancel();
         }
@@ -156,17 +159,17 @@ public class Client extends AppCompatActivity {
                     case R.id.add_in:
                         MediaInfo mediaInfoIn = new MediaInfo(20,20,"mediaInfoIn");
                         mMediaService.addMediaIn(mediaInfoIn);
-                        showToast("当前 media = "+mediaInfoIn);
+                        showToast("当前 media in = "+mediaInfoIn);
                         break;
                     case R.id.add_out:
                         MediaInfo mediaInfoOut = new MediaInfo(20,20,"mediaInfoOut");
-                        mMediaService.addMediaIn(mediaInfoOut);
-                        showToast("当前 media = "+mediaInfoOut);
+                        mMediaService.addMediaOut(mediaInfoOut);
+                        showToast("当前 media out = "+mediaInfoOut);
                         break;
                     case R.id.add_inout:
                         MediaInfo mediaInfoInout = new MediaInfo(20,20,"mediaInfoInout");
-                        mMediaService.addMediaIn(mediaInfoInout);
-                        showToast("当前 media = "+mediaInfoInout);
+                        mMediaService.addMediaInout(mediaInfoInout);
+                        showToast("当前 media inout = "+mediaInfoInout);
                         break;
                     default:
                         break;

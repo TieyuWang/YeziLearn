@@ -28,7 +28,7 @@ public class MediaInfo implements Parcelable {
     }
 
     public MediaInfo(Parcel in) {
-        Log.d(TAG, "AudioInfo: parcel in");
+        Log.d(TAG, "MediaInfo: parcel in");
         volumeIndex = in.readInt();
         stream = in.readInt();
         name = in.readString();
