@@ -42,27 +42,45 @@
         </LinearLayout>
 
         <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <Button
+            android:id="@+id/add_in"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="addIn"
+            android:onClick="@{buttonOnClickListener}"/>
+        <Button
+            android:id="@+id/add_out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="addOut"
+            android:onClick="@{buttonOnClickListener}"/>
+        <Button
+            android:id="@+id/add_inout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="addInout"
+            android:onClick="@{buttonOnClickListener}"/>
+    </LinearLayout>
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center">
             <Button
-                android:id="@+id/add_in"
+                android:id="@+id/register_cb"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="addIn"
+                android:text="registerCb"
                 android:onClick="@{buttonOnClickListener}"/>
             <Button
-                android:id="@+id/add_out"
+                android:id="@+id/unregister_cb"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="addOut"
-                android:onClick="@{buttonOnClickListener}"/>
-            <Button
-                android:id="@+id/add_inout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="addInout"
+                android:text="unregisterCb"
                 android:onClick="@{buttonOnClickListener}"/>
         </LinearLayout>
 

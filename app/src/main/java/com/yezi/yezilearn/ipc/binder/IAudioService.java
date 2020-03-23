@@ -4,12 +4,17 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.IInterface;
 import android.os.Parcel;
+import android.os.Parcelable;
 import android.os.RemoteException;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.yezi.yezilearn.ipc.bean.AudioInfo;
 import com.yezi.yezilearn.ipc.bean.MusicInfo;
+
+import java.util.concurrent.BlockingDeque;
 
 /**
  * @author : yezi
@@ -41,10 +46,45 @@ public interface IAudioService extends IInterface {
 
     /**
      * 获取 musicInfo
-     * @return MusicInfo
      * @throws RemoteException
      */
     MusicInfo getMusic() throws RemoteException;
+
+    /**
+     * in
+     * @param info
+     * @throws RemoteException
+     */
+    void addIn(AudioInfo info) throws RemoteException;
+
+    /**
+     * out
+     * @param info
+     * @throws RemoteException
+     */
+    void addOut(AudioInfo info) throws RemoteException;
+
+    /**
+     * inout
+     * @param info
+     * @return
+     * @throws RemoteException
+     */
+    void addInout(AudioInfo info) throws RemoteException;
+
+    /**
+     * 注册callback
+     * @param callback
+     * @throws RemoteException
+     */
+    void registerCallback(IAudioInfoCallback callback) throws RemoteException;
+
+    /**
+     * 注销callback
+     * @param callback
+     * @throws RemoteException
+     */
+    void unregisterCallback(IAudioInfoCallback callback) throws RemoteException;
 
     abstract class Stub extends Binder implements IAudioService{
         public static final int TRANSACTION_SET_VOLUME = IBinder.FIRST_CALL_TRANSACTION +1;
@@ -52,6 +92,11 @@ public interface IAudioService extends IInterface {
 
         public static final int TRANSACTION_SET_MUSIC = IBinder.FIRST_CALL_TRANSACTION +3;
         public static final int TRANSACTION_GET_MUSIC = IBinder.FIRST_CALL_TRANSACTION +4;
+        public static final int TRANSACTION_ADD_IN = IBinder.FIRST_CALL_TRANSACTION +5;
+        public static final int TRANSACTION_ADD_OUT = IBinder.FIRST_CALL_TRANSACTION +6;
+        public static final int TRANSACTION_ADD_INOUT = IBinder.FIRST_CALL_TRANSACTION +7;
+        public static final int TRANSACTION_REGISTER_CALLBACK = IBinder.FIRST_CALL_TRANSACTION +8;
+
 
         public static final String DESCRIPTOR = "com.yezi.yezilearn.ipc.binder.IAudioService";
 
@@ -102,7 +147,52 @@ public interface IAudioService extends IInterface {
                   //  reply.writeTypedObject(music,0);
                     reply.writeParcelable(music,0);
                     return true;
+                case TRANSACTION_ADD_IN:
+                    Log.d(TAG, "onTransact: TRANSACTION_ADD_IN");
+                    data.enforceInterface(DESCRIPTOR);
+                    AudioInfo audioInfoIn = null;
+                    if (data.readInt() == 1){
+                        audioInfoIn = AudioInfo.CREATOR.createFromParcel(data);
+                    }
+                    addIn(audioInfoIn);
+                    reply.writeNoException();
 
+                    return true;
+                case TRANSACTION_ADD_OUT:
+                    Log.d(TAG, "onTransact: TRANSACTION_ADD_OUT");
+                    data.enforceInterface(DESCRIPTOR);
+                    AudioInfo audioInfoOut = new AudioInfo();
+                    addOut(audioInfoOut);
+                    reply.writeNoException();
+                    if(audioInfoOut != null) {
+                        reply.writeInt(1);
+                        audioInfoOut.writeToParcel(reply, 0);
+                    }else {
+                        reply.writeInt(0);
+                    }
+                    return true;
+                case TRANSACTION_ADD_INOUT:
+                    Log.d(TAG, "onTransact: TRANSACTION_ADD_INOUT");
+                    data.enforceInterface(DESCRIPTOR);
+                    AudioInfo audioInfoInout = null;
+                    if (data.readInt() == 1){
+                        audioInfoInout = AudioInfo.CREATOR.createFromParcel(data);
+                    }
+                    reply.writeNoException();
+                    if(audioInfoInout != null) {
+                        reply.writeInt(1);
+                        audioInfoInout.writeToParcel(reply, Parcelable.PARCELABLE_WRITE_RETURN_VALUE);
+                    }else {
+                        reply.writeInt(0);
+                    }
+                    return true;
+                case TRANSACTION_REGISTER_CALLBACK:
+                    Log.d(TAG, "onTransact: TRANSACTION_REGISTER_CALLBACK");
+                    data.enforceInterface(DESCRIPTOR);
+                    IAudioInfoCallback callback = null;
+                    callback = IAudioInfoCallback.Stub.asInterface(data.readStrongBinder());
+                    registerCallback(callback);
+                    return true;
                 default:
                     Log.d(TAG, "onTransact: no match code");
             }
@@ -222,6 +312,104 @@ public interface IAudioService extends IInterface {
                 replay.recycle();
             }
             return result;
+        }
+
+        @Override
+        public void addIn(AudioInfo info) throws RemoteException {
+            Log.d(TAG, "addIn: ");
+            Parcel data = Parcel.obtain();
+            Parcel replay = Parcel.obtain();
+            try{
+                data.writeInterfaceToken(Stub.DESCRIPTOR);
+                if(info != null) {
+                    data.writeInt(1);
+                    info.writeToParcel(data, 0);
+                }else {
+                    data.writeInt(0);
+                }
+                mRemote.transact(Stub.TRANSACTION_ADD_IN,data,replay,0);
+                replay.readException();
+            }catch (SecurityException e){
+                e.printStackTrace();
+            }finally {
+                data.recycle();
+                replay.recycle();
+            }
+        }
+
+        @Override
+        public void addOut(AudioInfo info) throws RemoteException {
+            Log.d(TAG, "addOut: ");
+            Parcel data = Parcel.obtain();
+            Parcel replay = Parcel.obtain();
+            try{
+                data.writeInterfaceToken(Stub.DESCRIPTOR);
+                mRemote.transact(Stub.TRANSACTION_ADD_OUT,data,replay,0);
+                replay.readException();
+                if(replay.readInt() != 0 && info != null) {
+                    Log.d(TAG, "addOut: ");
+                    info.readFormParcel(replay);
+                }
+            }catch (SecurityException e){
+                e.printStackTrace();
+            }finally {
+                data.recycle();
+                replay.recycle();
+            }
+        }
+
+        @Override
+        public void addInout(AudioInfo info) throws RemoteException {
+            Log.d(TAG, "addInout: ");
+            Parcel data = Parcel.obtain();
+            Parcel replay = Parcel.obtain();
+            try{
+                data.writeInterfaceToken(Stub.DESCRIPTOR);
+                if(info != null) {
+                    data.writeInt(1);
+                    info.writeToParcel(data, 0);
+                }else {
+                    data.writeInt(0);
+                }
+                mRemote.transact(Stub.TRANSACTION_ADD_INOUT,data,replay,0);
+                replay.readException();
+                if(replay.readInt() != 0 && info != null) {
+                    info.readFormParcel(replay);
+                }
+            }catch (SecurityException e){
+                e.printStackTrace();
+            }finally {
+                data.recycle();
+                replay.recycle();
+            }
+        }
+
+        @Override
+        public void registerCallback(IAudioInfoCallback callback) throws RemoteException {
+            Log.d(TAG, "registerCallback: "+callback);
+            Parcel data = Parcel.obtain();
+            Parcel replay = Parcel.obtain();
+            try{
+                data.writeInterfaceToken(Stub.DESCRIPTOR);
+                if(callback != null){
+                    data.writeStrongBinder(callback.asBinder());
+                }else {
+                    data.writeStrongBinder(null);
+                }
+                mRemote.transact(Stub.TRANSACTION_REGISTER_CALLBACK,data,replay,0);
+                replay.readException();
+            }catch (SecurityException e){
+                e.printStackTrace();
+            }finally {
+                data.recycle();
+                replay.recycle();
+            }
+
+        }
+
+        @Override
+        public void unregisterCallback(IAudioInfoCallback callback) throws RemoteException {
+
         }
 
         @Override

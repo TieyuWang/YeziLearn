@@ -30,6 +30,10 @@ public class AudioInfo implements Parcelable {
         name = in.readString();
     }
 
+    public AudioInfo() {
+
+    }
+
     public int getVolumeIndex() {
         return volumeIndex;
     }
@@ -87,8 +91,16 @@ public class AudioInfo implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         Log.d(TAG, "writeToParcel: flag = "+i);
+        Log.d(TAG, "writeToParcel: "+volumeIndex+stream+name);
         parcel.writeInt(volumeIndex);
         parcel.writeInt(stream);
         parcel.writeString(name);
+    }
+
+    public void readFormParcel(Parcel in) {
+        Log.d(TAG, "readFormParcel: ");
+        volumeIndex = in.readInt();
+        stream = in.readInt();
+        name = in.readString();
     }
 }

@@ -17,10 +17,12 @@ import androidx.databinding.DataBindingUtil;
 
 import com.yezi.yezilearn.R;
 import com.yezi.yezilearn.databinding.ActivityIocClientBinding;
+import com.yezi.yezilearn.ipc.aidl.IMediaCallback;
 import com.yezi.yezilearn.ipc.aidl.IMediaService;
 import com.yezi.yezilearn.ipc.aidl.MediaInfo;
 import com.yezi.yezilearn.ipc.bean.AudioInfo;
 import com.yezi.yezilearn.ipc.bean.MusicInfo;
+import com.yezi.yezilearn.ipc.binder.IAudioInfoCallback;
 import com.yezi.yezilearn.ipc.binder.IAudioService;
 
 import java.util.ArrayList;
@@ -131,7 +133,14 @@ public class Client extends AppCompatActivity {
         musicInfo = new MusicInfo(primaryAudioInfo,audioInfoArrayList,"music 1");
     }
 
+    IAudioInfoCallback mAudioInfoCallback = new IAudioInfoCallback.Stub() {
 
+        @Override
+        public void onAudioInfoUpdate(AudioInfo info) throws RemoteException {
+            Log.d(TAG, "onAudioInfoUpdate: "+info);
+            showToast("onAudioInfoUpdate"+info.toString());
+        }
+    };
 
     View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -157,19 +166,34 @@ public class Client extends AppCompatActivity {
                         showToast("当前 music = "+music);
                         break;
                     case R.id.add_in:
-                        MediaInfo mediaInfoIn = new MediaInfo(20,20,"mediaInfoIn");
+                /*        MediaInfo mediaInfoIn = new MediaInfo(20,20,"mediaInfoIn");
                         mMediaService.addMediaIn(mediaInfoIn);
-                        showToast("当前 media in = "+mediaInfoIn);
+                        showToast("当前 media in = "+mediaInfoIn);*/
+                        AudioInfo audioInfoIn = new AudioInfo(20,20,"AudioInfoIn");
+                        mAudioService.addIn(audioInfoIn);
+                        showToast("当前 audio in = "+audioInfoIn);
                         break;
                     case R.id.add_out:
-                        MediaInfo mediaInfoOut = new MediaInfo(20,20,"mediaInfoOut");
+/*                        MediaInfo mediaInfoOut = new MediaInfo(20,20,"mediaInfoOut");
                         mMediaService.addMediaOut(mediaInfoOut);
-                        showToast("当前 media out = "+mediaInfoOut);
+                        showToast("当前 media out = "+mediaInfoOut);*/
+                        AudioInfo audioInfoOut = new AudioInfo(20,20,"AudioInfoOut");
+                        mAudioService.addOut(audioInfoOut);
+                        showToast("当前 audio out = "+audioInfoOut);
                         break;
                     case R.id.add_inout:
-                        MediaInfo mediaInfoInout = new MediaInfo(20,20,"mediaInfoInout");
+/*                        MediaInfo mediaInfoInout = new MediaInfo(20,20,"mediaInfoInout");
                         mMediaService.addMediaInout(mediaInfoInout);
-                        showToast("当前 media inout = "+mediaInfoInout);
+                        showToast("当前 media inout = "+mediaInfoInout);*/
+                        AudioInfo audioInfoInout = new AudioInfo(20,20,"AudioInfoInout");
+                        mAudioService.addInout(audioInfoInout);
+                        showToast("当前 audio inout = "+audioInfoInout);
+                        break;
+                    case R.id.register_cb:
+                        mAudioService.registerCallback(mAudioInfoCallback);
+                        break;
+                    case R.id.unregister_cb:
+                        mAudioService.unregisterCallback(mAudioInfoCallback);
                         break;
                     default:
                         break;

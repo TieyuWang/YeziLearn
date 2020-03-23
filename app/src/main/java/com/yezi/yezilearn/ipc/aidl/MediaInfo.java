@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import java.util.concurrent.BlockingDeque;
+
 /**
  * @author : yezi
  * @date : 2020/3/21 15:22
@@ -28,17 +30,13 @@ public class MediaInfo implements Parcelable {
     }
 
     public MediaInfo(Parcel in) {
-        Log.d(TAG, "MediaInfo: parcel in");
+        Log.d(TAG, "MediaInfo: parcel = "+in);
         volumeIndex = in.readInt();
         stream = in.readInt();
         name = in.readString();
     }
 
-    public void readFromParcel(Parcel in){
-        volumeIndex = in.readInt();
-        stream = in.readInt();
-        name = in.readString();
-    }
+
 
     public int getVolumeIndex() {
         return volumeIndex;
@@ -94,9 +92,16 @@ public class MediaInfo implements Parcelable {
         return 0;
     }
 
+    public void readFromParcel(Parcel in){
+        Log.d(TAG, "readFromParcel: parcel = "+in);
+        volumeIndex = in.readInt();
+        stream = in.readInt();
+        name = in.readString();
+    }
+
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        Log.d(TAG, "writeToParcel: flag = "+i);
+        Log.d(TAG, "writeToParcel: parcel = "+parcel+" flag = "+i);
         parcel.writeInt(volumeIndex);
         parcel.writeInt(stream);
         parcel.writeString(name);

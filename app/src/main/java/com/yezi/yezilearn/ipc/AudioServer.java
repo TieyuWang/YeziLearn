@@ -9,7 +9,9 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.yezi.yezilearn.ipc.bean.AudioInfo;
 import com.yezi.yezilearn.ipc.bean.MusicInfo;
+import com.yezi.yezilearn.ipc.binder.IAudioInfoCallback;
 import com.yezi.yezilearn.ipc.binder.IAudioService;
 
 /**
@@ -34,11 +36,20 @@ public class AudioServer extends Service {
 
     int mVolumeIndex = 0;
     MusicInfo mMusicInfo = null;
+    IAudioInfoCallback mAudioInfoCallback;
+
     Binder mServiceBinder = new IAudioService.Stub() {
         @Override
         public void setVolume(int index) {
             Log.d(TAG, "setVolume: "+index);
             mVolumeIndex = index;
+            if(mAudioInfoCallback != null){
+                try {
+                    mAudioInfoCallback.onAudioInfoUpdate(new AudioInfo(index,0,"callback"));
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         @Override
@@ -57,6 +68,36 @@ public class AudioServer extends Service {
         public MusicInfo getMusic() throws RemoteException {
             Log.d(TAG, "getMusic: "+mMusicInfo);
             return mMusicInfo;
+        }
+
+        @Override
+        public void addIn(AudioInfo info) throws RemoteException {
+            Log.d(TAG, "addIn: "+info);
+            info.setVolumeIndex(200);
+        }
+
+        @Override
+        public void addOut(AudioInfo info) throws RemoteException {
+            Log.d(TAG, "addOut: "+info);
+            info.setVolumeIndex(200);
+        }
+
+        @Override
+        public void addInout(AudioInfo info) throws RemoteException {
+            Log.d(TAG, "addInout: "+info);
+            info.setVolumeIndex(200);
+        }
+
+        @Override
+        public void registerCallback(IAudioInfoCallback callback) throws RemoteException {
+
+            Log.d(TAG, "registerCallback: "+callback+" pid = "+getCallingPid()+" pid = "+getCallingUid());
+            mAudioInfoCallback = callback;
+        }
+
+        @Override
+        public void unregisterCallback(IAudioInfoCallback callback) throws RemoteException {
+
         }
     };
 
